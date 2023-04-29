@@ -1,22 +1,23 @@
 import random
-import tkinter as tk
+import time
 
 random.seed(a=None, version=2)
-
-board = [[0 for x in range(9)] for y in range(9)]
-
-numbers_to_place = 81
+start_time = time.time()
 
 
-def place_numbers_on_board():
-    for number in range(numbers_to_place):
-        placed = False
-        while not placed:
-            placed = can_place(random.randint(0, 8), random.randint(0, 8), random.randint(1, 9))
+board = [[8, 0, 0,   0, 0, 0,    0, 0, 0],
+         [0, 0, 3,   6, 0, 0,    0, 0, 0],
+         [0, 7, 0,   0, 9, 0,    2, 0, 0],
 
+         [0, 5, 0,   0, 0, 7,    0, 0, 0],
+         [0, 0, 0,   0, 4, 5,    7, 0, 0],
+         [0, 0, 0,   1, 0, 0,    0, 3, 0],
+
+         [0, 0, 1,   0, 0, 0,    0, 6, 8],
+         [0, 0, 8,   5, 0, 0,    0, 1, 0],
+         [0, 9, 0,   0, 0, 0,    4, 0, 0]]
 
 def can_place(x, y, number_to_place):  # x - column    y - row
-    print(x, y, number_to_place)
     for column in range(9):
         if board[column][y] == number_to_place:
             return False
@@ -29,13 +30,34 @@ def can_place(x, y, number_to_place):  # x - column    y - row
 
     for i in range(box_y * 3, box_y * 3 + 3):
         for j in range(box_x * 3, box_x * 3 + 3):
-            if board[i][j] == number_to_place:
+            if board[j][i] == number_to_place:
                 return False
-
     return True
 
-    board[x][y] = number_to_place
-    return True
+
+def solve():
+    empty = find_empty()
+    if not empty:
+        return True
+    else:
+        x, y = empty
+    for num in range(1, 10):
+        if can_place(x, y, num):
+            board[x][y] = num
+
+            if solve():
+                return True
+
+            board[x][y] = 0
+    return False
+
+
+def find_empty():
+    for column in range(9):
+        for row in range(9):
+            if not board[column][row]:
+                return column, row
+    return None
 
 
 def print_board():
@@ -57,26 +79,9 @@ def print_board():
                 print("", end="   ")
 
 
-def build_window():
-    window = tk.Tk()
-    for i in range(9):
-        window.columnconfigure(i, weight=1, minsize=50)
-        window.rowconfigure(i, weight=1, minsize=50)
-        for j in range(9):
-            frame = tk.Frame(
-                master=window,
-                relief=tk.RAISED,
-                borderwidth=1
-            )
-            frame.grid(row=i, column=j, padx=1, pady=1)
-            label = tk.Label(master=frame, text=str(board[i][j]))
-            label.pack()
-    regenerate_button = tk.Button(master=window, text="Regenerate", command=place_numbers_on_board())
-    regenerate_button.grid(row=9, column=0, sticky="nsew")
-    solve_button = tk.Button(master=window, text="Solve", command=place_numbers_on_board())
-    solve_button.grid(row=9, column=3, sticky="nsew")
-    window.mainloop()
 
-
-place_numbers_on_board()
 print_board()
+solve()
+print("\n\n------------------------------------------")
+print_board()
+print("\n\n--- %s seconds ---" % (time.time() - start_time))
