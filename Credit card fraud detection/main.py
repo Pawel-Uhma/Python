@@ -39,7 +39,7 @@ new_data = pd.concat([legit_sample, fraud], axis=0)
 # Split data into features and targets
 X = new_data.drop(columns='Class', axis=1)
 Y = new_data['Class']
-jmnwa6
+
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, stratify=Y, random_state=2)
 print(X.shape, X_train.shape, X_test.shape)
 
